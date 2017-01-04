@@ -3,6 +3,7 @@ package pamflet
 import knockoff._
 import scala.util.parsing.input.Position
 import collection.mutable.ListBuffer
+import KnockoffChunk.FencedChunk
 
 trait FencedDiscounter extends Discounter {
   /** List of FencePlugin */
@@ -44,14 +45,14 @@ trait MutableFencedDiscounter extends FencedDiscounter {
     }
 }
 
-trait FencedChunkParser extends ChunkParser {
-  override def chunk : Parser[ Chunk ] = {
-    horizontalRule | leadingStrongTextBlock | leadingEmTextBlock | bulletItem |
-    numberedItem | indentedChunk | header | blockquote | linkDefinition |
-    htmlBlock | fencedChunk | textBlockWithBreak | textBlock | emptyLines | emptySpace
+trait FencedChunkParser {
+  def chunk: Parser[KnockoffChunk] = {
+    (horizontalRule | leadingStrongTextBlock | leadingEmTextBlock | bulletItem |
+     numberedItem | indentedChunk | header | blockquote | linkDefinition |
+     htmlBlock | textBlockWithBreak | textBlock | emptyLines | emptySpace).map(KnockoffChunk.Chunk) | fencedChunk
   }
   
-  def fencedChunk : Parser[ Chunk ] =
+  def fencedChunk : Parser[KnockoffChunk] =
     fence ~> opt(brush) ~ emptyLine ~
       rep1(unquotedTextLine | emptyLine) <~ fence <~ emptyLine ^^ {
         case (brush ~ _) ~ lines =>
@@ -69,17 +70,6 @@ trait FencedChunkParser extends ChunkParser {
 
   private def foldedString( texts : List[ Chunk ] ) : String =
     ( "" /: texts )( (current, text) => current + text.content )
-}
-
-case class FencedChunk(val content: String, language: Option[String])
-extends Chunk {
-  def appendNewBlock( list : ListBuffer[Block],
-                      remaining : List[ (Chunk, Seq[Span], Position) ],
-                      spans : Seq[Span], position : Position,
-                      discounter : Discounter ): Unit = discounter match {
-    case fd: FencedDiscounter => list += fd.fencedChunkToBlock(language, content, position, list)
-    case _ => sys.error("Expected FencedDiscounter") 
-  }
 }
 
 /** A FencePlugin must implement the following methods:

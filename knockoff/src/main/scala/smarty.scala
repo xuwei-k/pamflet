@@ -10,11 +10,11 @@ trait SmartyDiscounter extends Discounter {
 }
 
 trait SmartySpanConverter extends SpanConverter {
-  override def apply( chunk : Chunk ) : Seq[Span] = {
+  def apply(chunk: KnockoffChunk): Seq[Span] = {
     chunk match {
-      case IndentedChunk(content)  => List( new Text(content) )
-      case FencedChunk(content, _) => List( new Text(content) )
-      case _ => convert( chunk.content, Nil )
+      case KnockoffChunk.Chunk(IndentedChunk(content)) => List( new Text(content) )
+      case KnockoffChunk.FencedChunk(content, _) => List( new Text(content) )
+      case KnockoffChunk.Chunk(c) => convert(c.content, Nil )
     }
   }
 
