@@ -58,9 +58,9 @@ lazy val common = Seq(
 )
 
 lazy val knockoffDeps = Def.setting { Seq(
-  "org.foundweekends" %% "knockoff" % "0.8.6"
+  "org.foundweekends" %% "knockoff" % "0.8.10"
 )}
-val unfilteredVersion = "0.9.1"
+val unfilteredVersion = "0.10.0-M1"
 val stringtemplateVersion = "3.2.1"
 lazy val libraryDeps = Def.setting { Seq(
   "ws.unfiltered" %% "unfiltered-filter" % unfilteredVersion,
@@ -149,8 +149,6 @@ lazy val library: Project =
     name := "pamflet-library",
     description := "Core Pamflet library",
     libraryDependencies ++= libraryDeps.value,
-    libraryDependencies += "com.lihaoyi" %% "utest" % "0.6.3" % Test,
-    testFrameworks += new TestFramework("utest.runner.Framework"),
   ).
   dependsOn(knockoff)
 lazy val app: Project =

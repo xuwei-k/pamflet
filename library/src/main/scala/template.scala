@@ -28,7 +28,7 @@ case class StringTemplate(files: collection.Seq[File],
       import collection.JavaConverters._
       val st = new STImpl
       st.setTemplate(input.toString)
-      st.setAttributes((properties.asScala ++ extra).asJava)
+      st.setAttributes((properties.asScala ++ extra).toMap.asJava)
       st.toString
     } else input
     
