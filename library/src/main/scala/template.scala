@@ -13,14 +13,14 @@ trait Template {
   def get(key: String): Option[String]
   def defaultLanguage: String
   def defaultEncoding: String
-  def languages: Seq[String]
+  def languages: collection.Seq[String]
   /** Return a new instance of Template with additional pairs. */
   def updated(s: String): Template
   /** Return a new instance of Template with additional pairs. */
   def updated(ext: Map[String, AnyRef]): Template
 }
 
-case class StringTemplate(files: Seq[File],
+case class StringTemplate(files: collection.Seq[File],
     str: Option[String],
     extra: Map[AnyRef, AnyRef]) extends Template {
   def apply(input: CharSequence) =
@@ -28,7 +28,7 @@ case class StringTemplate(files: Seq[File],
       import collection.JavaConverters._
       val st = new STImpl
       st.setTemplate(input.toString)
-      st.setAttributes((properties.asScala ++ extra).asJava)
+      st.setAttributes((properties.asScala ++ extra).toMap.asJava)
       st.toString
     } else input
     
@@ -52,7 +52,7 @@ case class StringTemplate(files: Seq[File],
     get("language") getOrElse "en"
   lazy val defaultEncoding: String = 
     get("inputEncoding") getOrElse Charset.defaultCharset.name
-  lazy val languages: Seq[String] =
+  lazy val languages: collection.Seq[String] =
     get("languages") match {
       case Some(xs) => xs.split(",").toSeq map {_.trim}
       case None     => Seq(defaultLanguage) 
